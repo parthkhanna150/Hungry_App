@@ -14,7 +14,7 @@ import org.json.simple.parser.JSONParser;
 
 public class Recipe {
     public static void main(String[] args) throws Exception {
-        
+        String search;
         URL url = new URL("http://food2fork.com/api/search?key=d85c5181059fe178c852553259bba2e5&q=pasta");
         URLConnection conn = url.openConnection();
         conn.setRequestProperty("User-Agent", "Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10_5_8; en-US) AppleWebKit/532.5 (KHTML, like Gecko) Chrome/4.0.249.0 Safari/532.5");
