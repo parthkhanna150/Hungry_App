@@ -1,4 +1,3 @@
-
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -17,6 +16,7 @@ import java.awt.AlphaComposite;
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.RenderingHints;
+import java.awt.Toolkit;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
@@ -34,14 +34,14 @@ import javax.swing.JFrame;
  * @author vasu
  */
 public class mainFrame extends javax.swing.JFrame {
-        String title="";
-        String image_url="";
-        String rId="";
+
     /**
      * Creates new form mainFrame
      */
     public mainFrame() {
         initComponents();
+        setSize(800, 600);
+
     }
     
     /**
@@ -147,14 +147,12 @@ public class mainFrame extends javax.swing.JFrame {
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
                 mainFrame jf = new mainFrame();
-                jf.setSize(800, 600);
                 jf.setVisible(true);
             }
         });
     }
 
 public class Recipe implements Runnable{
-
         @Override
         public void run() {
         try{
@@ -178,11 +176,13 @@ public class Recipe implements Runnable{
 
         int x = 10; int y = 10;
         for(int i=0; i<recipes.size();i++){
+            
+        
             JSONObject recipesObject = (JSONObject) recipes.get(i);
-//            JSONObject recipesObject = (JSONObject) jsonParser.parse(recipes[i]);
-            title = (String) recipesObject.get("title");
-            image_url = (String) recipesObject.get("image_url");
-            rId = (String) recipesObject.get("rId");
+//          JSONObject recipesObject = (JSONObject) jsonParser.parse(recipes[i]);
+            String    title = (String) recipesObject.get("title");
+            String   image_url = (String) recipesObject.get("image_url");
+            String  rId = (String) recipesObject.get("recipe_id");
             sp[i]=new singlePanel();
             sp[i].setBounds(x, y, 200, 200);
             sp[i].lb_title.setText("<html>"+title+"<html>");
@@ -199,6 +199,7 @@ public class Recipe implements Runnable{
                     if(e.getClickCount()==2){
                         recipeDetail rd = new recipeDetail(title, image_url, rId);
                         rd.setVisible(true);
+
                     }
                 }
             });
@@ -211,9 +212,9 @@ public class Recipe implements Runnable{
                 x=10;
                 y+=240;
             }
-            System.out.println(title);  
-            System.out.println(image_url);
-            System.out.println(rId);  
+//            System.out.println(title);  
+//            System.out.println(image_url);
+//            System.out.println(rId);  
 
             }
         br.close();
@@ -237,7 +238,7 @@ public class Recipe implements Runnable{
         g2d.addRenderingHints(new RenderingHints(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY));
         g2d.drawImage(image, 0, 0, width, height, null);
         g2d.dispose();
-        System.out.println(bi);
+//        System.out.println(bi);
         return bi;
     }
         } 

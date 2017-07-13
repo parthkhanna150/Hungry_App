@@ -1,3 +1,25 @@
+
+import java.awt.Dimension;
+import java.awt.Graphics2D;
+import java.awt.RenderingHints;
+import java.awt.Toolkit;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.image.BufferedImage;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.net.URL;
+import java.net.URLConnection;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.imageio.ImageIO;
+import javax.swing.ImageIcon;
+import javax.swing.JLabel;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
+
 /*
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
@@ -10,9 +32,12 @@
  */
 public class recipeDetail extends javax.swing.JFrame {
     String title, imageUrl, rID;
-
+int w,h;
     /**
      * Creates new form recipeDetail
+     * @param title
+     * @param imageUrl
+     * @param rID
      */
     public recipeDetail(String title, String imageUrl, String rID) {
         initComponents();
@@ -20,8 +45,36 @@ public class recipeDetail extends javax.swing.JFrame {
         this.rID = rID;
         this.title = title;
         detail_title.setText("<html>"+this.title+"<html>");
+        try{
+            URL detail_img_url = new URL(this.imageUrl);
+            URLConnection conn2 = detail_img_url.openConnection();
+            conn2.setRequestProperty("User-Agent", "Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10_5_8; en-US) AppleWebKit/532.5 (KHTML, like Gecko) Chrome/4.0.249.0 Safari/532.5");
+            BufferedImage img = ImageIO.read(conn2.getInputStream());
+            BufferedImage tempJPG = resize(img,177, 88);
+            detail_icon.setIcon(new ImageIcon(tempJPG));
+             h=Toolkit.getDefaultToolkit().getScreenSize().height;
+             w=Toolkit.getDefaultToolkit().getScreenSize().width;
+            setSize(w,h);
+        }
+                catch(Exception ex)
+        {
+            ex.printStackTrace();
+        }
+        fetch_detail job = new fetch_detail();
+        Thread t = new Thread(job);
+        t.start();
     }
-
+    
+        public BufferedImage resize(BufferedImage image, int width, int height) {
+        BufferedImage bi = new BufferedImage(width, height, BufferedImage.TRANSLUCENT);
+        Graphics2D g2d = (Graphics2D) bi.createGraphics();
+        g2d.addRenderingHints(new RenderingHints(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY));
+        g2d.drawImage(image, 0, 0, width, height, null);
+        g2d.dispose();
+        System.out.println(bi);
+        return bi;
+    }
+        
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -31,26 +84,61 @@ public class recipeDetail extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        detail_panel = new javax.swing.JPanel();
+        detail_icon = new javax.swing.JLabel();
         detail_title = new javax.swing.JLabel();
+        ingredient_mainPanel = new javax.swing.JPanel();
+        ingredient_title = new javax.swing.JLabel();
+        ingredient_scrollpane = new javax.swing.JScrollPane();
+        data_panel = new javax.swing.JPanel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        getContentPane().setLayout(null);
 
-        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
-        getContentPane().setLayout(layout);
-        layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addGap(69, 69, 69)
-                .addComponent(detail_title, javax.swing.GroupLayout.PREFERRED_SIZE, 228, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(103, Short.MAX_VALUE))
+        detail_panel.setBackground(new java.awt.Color(255, 255, 255));
+        detail_panel.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
+        detail_panel.setSize(new java.awt.Dimension(1000, 130));
+
+        javax.swing.GroupLayout detail_panelLayout = new javax.swing.GroupLayout(detail_panel);
+        detail_panel.setLayout(detail_panelLayout);
+        detail_panelLayout.setHorizontalGroup(
+            detail_panelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(detail_panelLayout.createSequentialGroup()
+                .addGap(6, 6, 6)
+                .addComponent(detail_icon, javax.swing.GroupLayout.PREFERRED_SIZE, 177, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(12, 12, 12)
+                .addComponent(detail_title, javax.swing.GroupLayout.PREFERRED_SIZE, 178, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
-        layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addGap(38, 38, 38)
-                .addComponent(detail_title, javax.swing.GroupLayout.PREFERRED_SIZE, 57, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(205, Short.MAX_VALUE))
+        detail_panelLayout.setVerticalGroup(
+            detail_panelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(detail_panelLayout.createSequentialGroup()
+                .addGap(6, 6, 6)
+                .addComponent(detail_icon, javax.swing.GroupLayout.PREFERRED_SIZE, 88, javax.swing.GroupLayout.PREFERRED_SIZE))
+            .addGroup(detail_panelLayout.createSequentialGroup()
+                .addGap(14, 14, 14)
+                .addComponent(detail_title, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
+
+        getContentPane().add(detail_panel);
+        detail_panel.setBounds(0, 0, 830, 96);
+
+        ingredient_mainPanel.setBackground(new java.awt.Color(255, 255, 255));
+        ingredient_mainPanel.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
+        ingredient_mainPanel.setSize(new java.awt.Dimension(1000, 170));
+        ingredient_mainPanel.setLayout(null);
+
+        ingredient_title.setText("Ingredients");
+        ingredient_mainPanel.add(ingredient_title);
+        ingredient_title.setBounds(30, 20, 490, 20);
+
+        data_panel.setLayout(null);
+        ingredient_scrollpane.setViewportView(data_panel);
+
+        ingredient_mainPanel.add(ingredient_scrollpane);
+        ingredient_scrollpane.setBounds(10, 50, 680, 110);
+
+        getContentPane().add(ingredient_mainPanel);
+        ingredient_mainPanel.setBounds(0, 180, 830, 170);
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
@@ -58,38 +146,130 @@ public class recipeDetail extends javax.swing.JFrame {
     /**
      * @param args the command line arguments
      */
-    public static void main(String args[]) {
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-         */
-        try {
-            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
+//    public static void main(String args[]) {
+//        /* Set the Nimbus look and feel */
+//        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
+//        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
+//         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
+//         */
+//        try {
+//            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
+//                if ("Nimbus".equals(info.getName())) {
+//                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
+//                    break;
+//                }
+//            }
+//        } catch (ClassNotFoundException ex) {
+//            java.util.logging.Logger.getLogger(recipeDetail.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+//        } catch (InstantiationException ex) {
+//            java.util.logging.Logger.getLogger(recipeDetail.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+//        } catch (IllegalAccessException ex) {
+//            java.util.logging.Logger.getLogger(recipeDetail.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+//        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
+//            java.util.logging.Logger.getLogger(recipeDetail.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+//        }
+//        //</editor-fold>
+//
+//        
+//        /* Create and display the form */
+//        java.awt.EventQueue.invokeLater(new Runnable() {
+//            public void run() {
+//
+//            }
+//        });
+//    }
+    
+    
+    class fetch_detail implements Runnable{
+        @Override
+    public void run() {
+        try{
+        String id=rID;
+        URL url = new URL("http://food2fork.com/api/get?key="+credentials.APP_KEY+"&rId="+id);
+        URLConnection conn = url.openConnection();
+        conn.setRequestProperty("User-Agent", "Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10_5_8; en-US) AppleWebKit/532.5 (KHTML, like Gecko) Chrome/4.0.249.0 Safari/532.5");
+        BufferedReader br = new BufferedReader(
+        new InputStreamReader(conn.getInputStream()));
+        JSONParser jsonParser = new JSONParser();
+        
+        JSONObject jsonObject = (JSONObject) jsonParser.parse(br.readLine());//Full Search Object
+        
+        JSONObject recipe = (JSONObject) jsonObject.get("recipe");
+        String source = (String) recipe.get("source_url");
+        JSONArray ingredients = (JSONArray) recipe.get("ingredients");
+//        System.out.println(count);
+        JLabel[] ingredLabel = new JLabel[(int)ingredients.size()];
+        data_panel.setPreferredSize(new Dimension(600, 5000));
+        int y = 10;
+        for(int i=0; i<ingredLabel.length;i++){
+            ingredLabel[i]=new JLabel();
+            ingredLabel[i].setBounds(10, y, 600, 10);
+            ingredLabel[i].setText((String)ingredients.get(i));
+            data_panel.add(ingredLabel[i]);
+            data_panel.repaint();
+            y+=20;
+            }
+        
+            setSize(w+1, h+1);
+            setSize(w, h);
+        
+        br.close();
+        String procedure = fetch_description(source);
+        System.out.println(procedure);
+        }
+        catch(Exception ex){
+            ex.printStackTrace();
+        }
+    }
+ }
+    public String fetch_description(String source_url){
+//        System.out.println(source_url);
+        String response="";
+        try{
+            int index;
+            URL desc = new URL(source_url);
+            URLConnection conn = desc.openConnection();
+            conn.setRequestProperty("User-Agent", "Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10_5_8; en-US) AppleWebKit/532.5 (KHTML, like Gecko) Chrome/4.0.249.0 Safari/532.5");
+            BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+            String webpage = "";
+            while(true){
+//                System.out.println("IN WHILE LOOP");
+                String sub = br.readLine();
+                if(sub==null)
+                {
                     break;
                 }
+                
+                webpage += sub;
+//                System.out.println(webpage);
             }
-        } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(recipeDetail.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(recipeDetail.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(recipeDetail.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(recipeDetail.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+//            System.out.println(webpage);
+            String instr = "nstruction";
+            if(webpage.indexOf(instr)==-1){
+                response = "Not available";
+            }
+            else{
+                index = webpage.indexOf(instr);
+                System.out.println(index);
+                 response = webpage.substring(webpage.indexOf(">",index)+1, webpage.indexOf("<",webpage.indexOf(">",index)+1));
+                }
+            }
+        catch(Exception ex){
+            ex.printStackTrace();
         }
-        //</editor-fold>
-
-        /* Create and display the form */
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-            }
-        });
+        return response;
     }
-
+    
+        
+    
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JPanel data_panel;
+    private javax.swing.JLabel detail_icon;
+    private javax.swing.JPanel detail_panel;
     private javax.swing.JLabel detail_title;
+    private javax.swing.JPanel ingredient_mainPanel;
+    private javax.swing.JScrollPane ingredient_scrollpane;
+    private javax.swing.JLabel ingredient_title;
     // End of variables declaration//GEN-END:variables
+
 }
