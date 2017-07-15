@@ -1,4 +1,5 @@
 
+import java.awt.Desktop;
 import java.awt.Dimension;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
@@ -7,7 +8,14 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.InputStreamReader;
+import java.io.PrintWriter;
+import java.io.Writer;
+import java.net.URI;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.logging.Level;
@@ -31,8 +39,12 @@ import org.json.simple.parser.ParseException;
  * @author vasu
  */
 public class recipeDetail extends javax.swing.JFrame {
+    String source_url;
+    String ingredientString="";
     String title, imageUrl, rID;
+    String procedure;
 int w,h;
+File fw;
     /**
      * Creates new form recipeDetail
      * @param title
@@ -52,9 +64,38 @@ int w,h;
             BufferedImage img = ImageIO.read(conn2.getInputStream());
             BufferedImage tempJPG = resize(img,177, 88);
             detail_icon.setIcon(new ImageIcon(tempJPG));
-             h=Toolkit.getDefaultToolkit().getScreenSize().height;
-             w=Toolkit.getDefaultToolkit().getScreenSize().width;
+            h=Toolkit.getDefaultToolkit().getScreenSize().height;
+            w=Toolkit.getDefaultToolkit().getScreenSize().width;
             setSize(w,h);
+            
+            fw = new File("favourites.txt");
+            if(fw.exists()){
+                
+            FileInputStream fis = new FileInputStream("favourites.txt");
+            BufferedReader br = new BufferedReader(new InputStreamReader(fis));
+            String s1="";
+            String tmp="";
+            while(true){
+                tmp = br.readLine();
+                if(tmp==null){
+                    break;
+                }
+                s1+=tmp;
+               
+            }
+                if(s1.contains(";"+rID+";")){
+                    addToFavouriteGrey.setVisible(false);
+                    addToFavouriteRed.setVisible(true);
+                }
+                else{
+                    addToFavouriteRed.setVisible(false);
+                    addToFavouriteGrey.setVisible(true);
+                }            
+            }
+            else{
+                    addToFavouriteRed.setVisible(false);
+                    addToFavouriteGrey.setVisible(true);
+            }
         }
                 catch(Exception ex)
         {
@@ -63,6 +104,7 @@ int w,h;
         fetch_detail job = new fetch_detail();
         Thread t = new Thread(job);
         t.start();
+
     }
     
         public BufferedImage resize(BufferedImage image, int width, int height) {
@@ -71,7 +113,7 @@ int w,h;
         g2d.addRenderingHints(new RenderingHints(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY));
         g2d.drawImage(image, 0, 0, width, height, null);
         g2d.dispose();
-        System.out.println(bi);
+//        System.out.println(bi);
         return bi;
     }
         
@@ -87,44 +129,65 @@ int w,h;
         detail_panel = new javax.swing.JPanel();
         detail_icon = new javax.swing.JLabel();
         detail_title = new javax.swing.JLabel();
+        addToFavouriteGrey = new javax.swing.JButton();
+        addToFavouriteRed = new javax.swing.JButton();
+        offlineButton = new javax.swing.JButton();
         ingredient_mainPanel = new javax.swing.JPanel();
         ingredient_title = new javax.swing.JLabel();
         ingredient_scrollpane = new javax.swing.JScrollPane();
         data_panel = new javax.swing.JPanel();
+        procedure_mainPanel = new javax.swing.JPanel();
+        instructionTitle = new javax.swing.JLabel();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        instructions_editor = new javax.swing.JEditorPane();
+        openBrowser = new javax.swing.JButton();
 
-        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         getContentPane().setLayout(null);
 
         detail_panel.setBackground(new java.awt.Color(255, 255, 255));
         detail_panel.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
-        detail_panel.setSize(new java.awt.Dimension(1000, 130));
+        detail_panel.setToolTipText("");
+        detail_panel.setLayout(null);
+        detail_panel.add(detail_icon);
+        detail_icon.setBounds(7, 7, 177, 88);
+        detail_panel.add(detail_title);
+        detail_title.setBounds(200, 40, 178, 31);
 
-        javax.swing.GroupLayout detail_panelLayout = new javax.swing.GroupLayout(detail_panel);
-        detail_panel.setLayout(detail_panelLayout);
-        detail_panelLayout.setHorizontalGroup(
-            detail_panelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(detail_panelLayout.createSequentialGroup()
-                .addGap(6, 6, 6)
-                .addComponent(detail_icon, javax.swing.GroupLayout.PREFERRED_SIZE, 177, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(12, 12, 12)
-                .addComponent(detail_title, javax.swing.GroupLayout.PREFERRED_SIZE, 178, javax.swing.GroupLayout.PREFERRED_SIZE))
-        );
-        detail_panelLayout.setVerticalGroup(
-            detail_panelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(detail_panelLayout.createSequentialGroup()
-                .addGap(6, 6, 6)
-                .addComponent(detail_icon, javax.swing.GroupLayout.PREFERRED_SIZE, 88, javax.swing.GroupLayout.PREFERRED_SIZE))
-            .addGroup(detail_panelLayout.createSequentialGroup()
-                .addGap(14, 14, 14)
-                .addComponent(detail_title, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE))
-        );
+        addToFavouriteGrey.setIcon(new javax.swing.ImageIcon(getClass().getResource("/grey.png"))); // NOI18N
+        addToFavouriteGrey.setText("Add to favourites");
+        addToFavouriteGrey.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                addToFavouriteGreyActionPerformed(evt);
+            }
+        });
+        detail_panel.add(addToFavouriteGrey);
+        addToFavouriteGrey.setBounds(200, 80, 170, 40);
+
+        addToFavouriteRed.setIcon(new javax.swing.ImageIcon(getClass().getResource("/red1.png"))); // NOI18N
+        addToFavouriteRed.setText("Add to favourites");
+        addToFavouriteRed.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                addToFavouriteRedActionPerformed(evt);
+            }
+        });
+        detail_panel.add(addToFavouriteRed);
+        addToFavouriteRed.setBounds(200, 90, 170, 29);
+
+        offlineButton.setText("Save Offline");
+        offlineButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                offlineButtonActionPerformed(evt);
+            }
+        });
+        detail_panel.add(offlineButton);
+        offlineButton.setBounds(190, 9, 190, 30);
 
         getContentPane().add(detail_panel);
-        detail_panel.setBounds(0, 0, 830, 96);
+        detail_panel.setBounds(0, -1, 830, 140);
 
         ingredient_mainPanel.setBackground(new java.awt.Color(255, 255, 255));
         ingredient_mainPanel.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
-        ingredient_mainPanel.setSize(new java.awt.Dimension(1000, 170));
         ingredient_mainPanel.setLayout(null);
 
         ingredient_title.setText("Ingredients");
@@ -140,9 +203,161 @@ int w,h;
         getContentPane().add(ingredient_mainPanel);
         ingredient_mainPanel.setBounds(0, 180, 830, 170);
 
+        procedure_mainPanel.setBackground(new java.awt.Color(255, 255, 255));
+        procedure_mainPanel.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
+        procedure_mainPanel.setLayout(null);
+
+        instructionTitle.setText("Instructions");
+        procedure_mainPanel.add(instructionTitle);
+        instructionTitle.setBounds(30, 10, 90, 20);
+
+        instructions_editor.setSize(new java.awt.Dimension(100, 40));
+        jScrollPane1.setViewportView(instructions_editor);
+
+        procedure_mainPanel.add(jScrollPane1);
+        jScrollPane1.setBounds(10, 40, 680, 130);
+
+        openBrowser.setText("Look Up");
+        openBrowser.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                openBrowserActionPerformed(evt);
+            }
+        });
+        procedure_mainPanel.add(openBrowser);
+        openBrowser.setBounds(590, 10, 100, 29);
+
+        getContentPane().add(procedure_mainPanel);
+        procedure_mainPanel.setBounds(0, 380, 830, 270);
+
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
+    private void openBrowserActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_openBrowserActionPerformed
+        // TODO add your handling code here:
+        try{
+        Desktop.getDesktop().browse(new URI(source_url));
+        }
+        catch(Exception ex){
+            ex.printStackTrace();
+        }
+    }//GEN-LAST:event_openBrowserActionPerformed
+
+    private void addToFavouriteRedActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addToFavouriteRedActionPerformed
+        // TODO add your handling code here:
+        try{
+            String tmp;
+            String t="";
+            FileInputStream fis = new FileInputStream("favourites.txt");
+            BufferedReader br = new BufferedReader(new InputStreamReader(fis));
+            while(true){
+                tmp = br.readLine();
+                if(tmp==null){
+//                    System.out.println("Broken");
+                    break;
+                }
+//                System.out.println(t + "<--t \n \n \n tmp-->  " + tmp);
+                t += tmp;
+            }
+//            System.out.println(t);
+                if(t.contains(";"+rID+";")){
+                    int start = t.indexOf(";"+rID+";");
+                    int stop = t.lastIndexOf(";"+rID+";");
+                    int end = t.indexOf("`", stop);
+//                    System.out.println(start + " " + end);
+                    String remove = t.substring(start, end+1);
+                    
+//                    System.out.println(start + " " + end);
+//                    System.out.println(remove + " " + remove.length());
+//                    System.out.println(t);
+                    t = t.replace(remove, "");
+                }
+        br.close();
+        fis.close();
+//        fw.delete();
+
+//            System.out.println(t+"-------");
+
+        FileOutputStream fos1 = new FileOutputStream("favourites.txt");
+        PrintWriter pw1 = new PrintWriter(fos1);
+        pw1.write(t);
+        pw1.close();
+        fos1.close();
+        }
+        catch(Exception ex){
+            ex.printStackTrace();
+        }
+        addToFavouriteRed.setVisible(false);
+        addToFavouriteGrey.setVisible(true);
+    }//GEN-LAST:event_addToFavouriteRedActionPerformed
+
+    private void addToFavouriteGreyActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addToFavouriteGreyActionPerformed
+        // TODO add your handling code here:
+        try{
+        FileOutputStream fos = new FileOutputStream("favourites.txt", true);
+        PrintWriter writer = new PrintWriter(fos);
+        writer.println(";"+rID+";"+title+";"+ imageUrl);
+        writer.close();  
+        }
+        catch(Exception ex){
+            ex.printStackTrace();
+        }
+        addToFavouriteGrey.setVisible(false);
+        addToFavouriteRed.setVisible(true);
+    }//GEN-LAST:event_addToFavouriteGreyActionPerformed
+
+    private void offlineButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_offlineButtonActionPerformed
+        // TODO add your handling code here:
+        File offline = new File("OfflineFolder");
+        if(!offline.exists()){
+            offline.mkdir();
+        }
+        String ing = ingredientString;
+        String procedure1 = procedure;
+        String head = title;
+        String html = generate_offline_page(ing, procedure1, head);
+        try{
+        FileOutputStream f = new FileOutputStream(offline+"//"+rID+".html");
+        PrintWriter pw = new PrintWriter(f);
+        pw.println(html);
+        pw.flush();
+        f.close();
+        }
+        catch(Exception ex){
+            ex.printStackTrace();
+        }
+    }//GEN-LAST:event_offlineButtonActionPerformed
+        String generate_offline_page(String ing, String procedure1, String title) {
+            String offline = "<html>\n"
+                + "    <head>\n"
+                + "        <title>" + title + "</title>\n"
+                + "      \n"
+                + "    </head>\n"
+                + "    <body style=\"background: #ccccff\">\n"
+                + "        \n"
+                + "        <div style=\"border: solid 1px black; border-radius: 5px;background: white; padding: 20px \">\n"
+//                + "            <img src=\""+rId+".jpg\" width=\"100\" height=\"100\" />\n"
+                + "            \n"
+                + "            <label style=\"font-style: italic; font-size: 25px; position: relative; top: -50px;left: 50px\"><b>" + title + "</b></label>\n"
+                + "            \n"
+                + "        </div>\n"
+                + "        \n"
+                + "        <div style=\"border: solid 1px black; border-radius: 5px;background: white; padding: 20px; margin-top: 10px \">\n"
+                + "            <label style=\"font-size: 25px; \">Ingredients</label><br>\n" + ing
+                + "                       \n"
+                + "        </div>\n"
+                + "        \n"
+                + "        <div style=\"border: solid 1px black; border-radius: 5px;background: white; padding: 20px; margin-top: 10px \">\n"
+                + "            <label style=\"font-size: 25px; \">Procedure</label><br>\n" + procedure1
+                + "                   \n"
+                + "        </div>\n"
+                + "        \n"
+                + "        \n"
+                + "    </body>\n"
+                + "</html>\n"
+                + "";
+
+            return offline;
+        }
     /**
      * @param args the command line arguments
      */
@@ -185,7 +400,7 @@ int w,h;
     public void run() {
         try{
         String id=rID;
-        URL url = new URL("http://food2fork.com/api/get?key="+credentials.APP_KEY+"&rId="+id);
+        URL url = new URL("http://food2fork.com/api/get?key="+credentials.API_KEY+"&rId="+id);
         URLConnection conn = url.openConnection();
         conn.setRequestProperty("User-Agent", "Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10_5_8; en-US) AppleWebKit/532.5 (KHTML, like Gecko) Chrome/4.0.249.0 Safari/532.5");
         BufferedReader br = new BufferedReader(
@@ -205,6 +420,9 @@ int w,h;
             ingredLabel[i]=new JLabel();
             ingredLabel[i].setBounds(10, y, 600, 10);
             ingredLabel[i].setText((String)ingredients.get(i));
+            
+            ingredientString += (String) ingredients.get(i) +"<br>";//string for offline pages
+            
             data_panel.add(ingredLabel[i]);
             data_panel.repaint();
             y+=20;
@@ -214,8 +432,11 @@ int w,h;
             setSize(w, h);
         
         br.close();
-        String procedure = fetch_description(source);
-        System.out.println(procedure);
+        procedure = fetch_description(source);
+//        System.out.println(procedure);
+//        if(procedure.equals("Not available"))
+//            openBrowser.setVisible(false);
+        instructions_editor.setText(procedure);
         }
         catch(Exception ex){
             ex.printStackTrace();
@@ -247,11 +468,13 @@ int w,h;
             String instr = "nstruction";
             if(webpage.indexOf(instr)==-1){
                 response = "Not available";
+                openBrowser.setVisible(true);
             }
             else{
+                openBrowser.setVisible(false);
                 index = webpage.indexOf(instr);
-                System.out.println(index);
-                 response = webpage.substring(webpage.indexOf(">",index)+1, webpage.indexOf("<",webpage.indexOf(">",index)+1));
+//                System.out.println(index);
+                response = webpage.substring(webpage.indexOf(">",index)+1, webpage.indexOf("<",webpage.indexOf(">",index)+1));
                 }
             }
         catch(Exception ex){
@@ -263,6 +486,8 @@ int w,h;
         
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton addToFavouriteGrey;
+    private javax.swing.JButton addToFavouriteRed;
     private javax.swing.JPanel data_panel;
     private javax.swing.JLabel detail_icon;
     private javax.swing.JPanel detail_panel;
@@ -270,6 +495,12 @@ int w,h;
     private javax.swing.JPanel ingredient_mainPanel;
     private javax.swing.JScrollPane ingredient_scrollpane;
     private javax.swing.JLabel ingredient_title;
+    private javax.swing.JLabel instructionTitle;
+    private javax.swing.JEditorPane instructions_editor;
+    private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JButton offlineButton;
+    private javax.swing.JButton openBrowser;
+    private javax.swing.JPanel procedure_mainPanel;
     // End of variables declaration//GEN-END:variables
 
 }

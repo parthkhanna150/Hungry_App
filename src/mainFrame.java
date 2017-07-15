@@ -1,3 +1,4 @@
+
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -21,8 +22,11 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.StringTokenizer;
 import javax.swing.JFrame;
+
 /*
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
@@ -43,7 +47,7 @@ public class mainFrame extends javax.swing.JFrame {
         setSize(800, 600);
 
     }
-    
+
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -57,6 +61,7 @@ public class mainFrame extends javax.swing.JFrame {
         searchTf = new javax.swing.JTextField();
         mainScrollPane = new javax.swing.JScrollPane();
         mainFrame = new javax.swing.JPanel();
+        favouritesButton = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setSize(new java.awt.Dimension(600, 600));
@@ -77,19 +82,30 @@ public class mainFrame extends javax.swing.JFrame {
         mainFrame.setLayout(null);
         mainScrollPane.setViewportView(mainFrame);
 
+        favouritesButton.setText("View favourites");
+        favouritesButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                favouritesButtonActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addGap(58, 58, 58)
-                .addComponent(searchTf)
-                .addGap(35, 35, 35)
-                .addComponent(searchBt, javax.swing.GroupLayout.PREFERRED_SIZE, 68, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(97, 97, 97))
             .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(mainScrollPane)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                        .addGap(58, 58, 58)
+                        .addComponent(searchTf, javax.swing.GroupLayout.DEFAULT_SIZE, 248, Short.MAX_VALUE)
+                        .addGap(18, 18, 18)
+                        .addComponent(searchBt, javax.swing.GroupLayout.PREFERRED_SIZE, 68, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(18, 18, 18)
+                        .addComponent(favouritesButton)
+                        .addGap(5, 5, 5))
+                    .addGroup(layout.createSequentialGroup()
+                        .addContainerGap()
+                        .addComponent(mainScrollPane)))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -98,9 +114,10 @@ public class mainFrame extends javax.swing.JFrame {
                 .addGap(36, 36, 36)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(searchBt)
-                    .addComponent(searchTf, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(searchTf, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(favouritesButton))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(mainScrollPane))
+                .addComponent(mainScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 280, Short.MAX_VALUE))
         );
 
         pack();
@@ -109,12 +126,17 @@ public class mainFrame extends javax.swing.JFrame {
     private void searchBtActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_searchBtActionPerformed
         Recipe job = new Recipe();
         Thread t = new Thread(job);
-        t.start();  
+        t.start();
     }//GEN-LAST:event_searchBtActionPerformed
 
     private void searchTfActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_searchTfActionPerformed
-        
+
     }//GEN-LAST:event_searchTfActionPerformed
+
+    private void favouritesButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_favouritesButtonActionPerformed
+        // TODO add your handling code here:
+        favouritesFrame obj = new favouritesFrame();
+    }//GEN-LAST:event_favouritesButtonActionPerformed
 
     /**
      * @param args the command line arguments
@@ -152,77 +174,75 @@ public class mainFrame extends javax.swing.JFrame {
         });
     }
 
-public class Recipe implements Runnable{
+    public class Recipe implements Runnable {
+
         @Override
         public void run() {
-        try{
-                
-        String search=searchTf.getText();
-        search.replaceAll(" ", "%20");
-        URL url = new URL("http://food2fork.com/api/search?key="+credentials.APP_KEY+"&q="+search);
-        URLConnection conn = url.openConnection();
-        conn.setRequestProperty("User-Agent", "Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10_5_8; en-US) AppleWebKit/532.5 (KHTML, like Gecko) Chrome/4.0.249.0 Safari/532.5");
-        BufferedReader br = new BufferedReader(
-        new InputStreamReader(conn.getInputStream()));
-        JSONParser jsonParser = new JSONParser();
-        
-        JSONObject jsonObject = (JSONObject) jsonParser.parse(br.readLine());//Full Search Object
-        
-        long count = (long) jsonObject.get("count");
+            try {
+                mainFrame.removeAll();
+                String search = searchTf.getText();
+                search.replaceAll(" ", "%20");
+                URL url = new URL("http://food2fork.com/api/search?key=" + credentials.API_KEY + "&q=" + search);
+                URLConnection conn = url.openConnection();
+                conn.setRequestProperty("User-Agent", "Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10_5_8; en-US) AppleWebKit/532.5 (KHTML, like Gecko) Chrome/4.0.249.0 Safari/532.5");
+                BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+                JSONParser jsonParser = new JSONParser();
+
+                JSONObject jsonObject = (JSONObject) jsonParser.parse(br.readLine());//Full Search Object
+
+                long count = (long) jsonObject.get("count");
 //        System.out.println(count);
-        singlePanel[] sp = new singlePanel[(int)count];
-        mainFrame.setPreferredSize(new Dimension(600, 5000));
-        JSONArray recipes = (JSONArray) jsonObject.get("recipes");//Object of recipes array[objects]
+                singlePanel[] sp = new singlePanel[(int) count];
+                mainFrame.setPreferredSize(new Dimension(600, 5000));
+                JSONArray recipes = (JSONArray) jsonObject.get("recipes");//Object of recipes array[objects]
 
-        int x = 10; int y = 10;
-        for(int i=0; i<recipes.size();i++){
-            
-        
-            JSONObject recipesObject = (JSONObject) recipes.get(i);
+                int x = 10;
+                int y = 10;
+                for (int i = 0; i < recipes.size(); i++) {
+
+                    JSONObject recipesObject = (JSONObject) recipes.get(i);
 //          JSONObject recipesObject = (JSONObject) jsonParser.parse(recipes[i]);
-            String    title = (String) recipesObject.get("title");
-            String   image_url = (String) recipesObject.get("image_url");
-            String  rId = (String) recipesObject.get("recipe_id");
-            sp[i]=new singlePanel();
-            sp[i].setBounds(x, y, 200, 200);
-            sp[i].lb_title.setText("<html>"+title+"<html>");
-            URL imageUrl = new URL(image_url);
-            URLConnection conn1 = imageUrl.openConnection();
-            conn1.setRequestProperty("User-Agent", "Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10_5_8; en-US) AppleWebKit/532.5 (KHTML, like Gecko) Chrome/4.0.249.0 Safari/532.5");
-            BufferedImage img = ImageIO.read(conn1.getInputStream());
-            BufferedImage tempJPG = resize(img, 200, 200);
-            sp[i].lb_icon.setIcon(new ImageIcon(tempJPG));
-            
-            sp[i].addMouseListener(new MouseAdapter() {
-                @Override
-                public void mouseClicked(MouseEvent e) {
-                    if(e.getClickCount()==2){
-                        recipeDetail rd = new recipeDetail(title, image_url, rId);
-                        rd.setVisible(true);
+                    String title = (String) recipesObject.get("title");
+                    String image_url = (String) recipesObject.get("image_url");
+                    String rId = (String) recipesObject.get("recipe_id");
+                    sp[i] = new singlePanel();
+                    sp[i].setBounds(x, y, 200, 200);
+                    sp[i].lb_title.setText("<html>" + title + "<html>");
+                    URL imageUrl = new URL(image_url);
+                    URLConnection conn1 = imageUrl.openConnection();
+                    conn1.setRequestProperty("User-Agent", "Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10_5_8; en-US) AppleWebKit/532.5 (KHTML, like Gecko) Chrome/4.0.249.0 Safari/532.5");
+                    BufferedImage img = ImageIO.read(conn1.getInputStream());
+                    BufferedImage tempJPG = resize(img, 200, 200);
+                    sp[i].lb_icon.setIcon(new ImageIcon(tempJPG));
 
+                    sp[i].addMouseListener(new MouseAdapter() {
+                        @Override
+                        public void mouseClicked(MouseEvent e) {
+                            if (e.getClickCount() == 2) {
+                                recipeDetail rd = new recipeDetail(title, image_url, rId);
+                                rd.setVisible(true);
+
+                            }
+                        }
+                    });
+
+                    mainFrame.add(sp[i]);
+                    repaint();
+                    if (x < 500) {
+                        x += 240;
+                    } else {
+                        x = 10;
+                        y += 240;
                     }
-                }
-            });
-            
-            mainFrame.add(sp[i]);
-            if(x<500)
-                x+=240;
-            else
-            {
-                x=10;
-                y+=240;
-            }
 //            System.out.println(title);  
 //            System.out.println(image_url);
 //            System.out.println(rId);  
-
-            }
-        br.close();
-        }
-            catch(Exception ex)
-            {
+                    
+                }
+                br.close();
+            } catch (Exception ex) {
                 ex.printStackTrace();
-            }           
+            }
         }
 
         /**
@@ -232,18 +252,19 @@ public class Recipe implements Runnable{
          * @param height
          * @return
          */
-        public  BufferedImage resize(BufferedImage image, int width, int height) {
-        BufferedImage bi = new BufferedImage(width, height, BufferedImage.TRANSLUCENT);
-        Graphics2D g2d = (Graphics2D) bi.createGraphics();
-        g2d.addRenderingHints(new RenderingHints(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY));
-        g2d.drawImage(image, 0, 0, width, height, null);
-        g2d.dispose();
+        public BufferedImage resize(BufferedImage image, int width, int height) {
+            BufferedImage bi = new BufferedImage(width, height, BufferedImage.TRANSLUCENT);
+            Graphics2D g2d = (Graphics2D) bi.createGraphics();
+            g2d.addRenderingHints(new RenderingHints(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY));
+            g2d.drawImage(image, 0, 0, width, height, null);
+            g2d.dispose();
 //        System.out.println(bi);
-        return bi;
+            return bi;
+        }
     }
-        } 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton favouritesButton;
     private javax.swing.JPanel mainFrame;
     private javax.swing.JScrollPane mainScrollPane;
     private javax.swing.JButton searchBt;
