@@ -1,4 +1,5 @@
 
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -13,7 +14,6 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import java.awt.Graphics;
-import java.awt.AlphaComposite;
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.RenderingHints;
@@ -32,7 +32,6 @@ import javax.swing.JFrame;
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-
 /**
  *
  * @author vasu
@@ -42,10 +41,15 @@ public class mainFrame extends javax.swing.JFrame {
     /**
      * Creates new form mainFrame
      */
+    int h = Toolkit.getDefaultToolkit().getScreenSize().height;
+    int w = Toolkit.getDefaultToolkit().getScreenSize().width;
+
     public mainFrame() {
         initComponents();
-        setSize(800, 600);
-
+        this.setSize(w, h);
+        mainPanel.setSize(w,h);
+        mainPanel.setPreferredSize(new Dimension(600,5000));
+        getContentPane().setBackground(Color.pink);
     }
 
     /**
@@ -60,27 +64,39 @@ public class mainFrame extends javax.swing.JFrame {
         searchBt = new javax.swing.JButton();
         searchTf = new javax.swing.JTextField();
         mainScrollPane = new javax.swing.JScrollPane();
-        mainFrame = new javax.swing.JPanel();
+        mainPanel = new javax.swing.JPanel();
         favouritesButton = new javax.swing.JButton();
+        viewOffline = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setForeground(new java.awt.Color(204, 51, 0));
         setSize(new java.awt.Dimension(600, 600));
+        getContentPane().setLayout(null);
 
         searchBt.setText("Search");
+        searchBt.setMargin(new java.awt.Insets(0, 0, 0, 0));
         searchBt.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 searchBtActionPerformed(evt);
             }
         });
+        getContentPane().add(searchBt);
+        searchBt.setBounds(900, 20, 68, 56);
 
+        searchTf.setFont(new java.awt.Font("Lucida Grande", 2, 14)); // NOI18N
         searchTf.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 searchTfActionPerformed(evt);
             }
         });
+        getContentPane().add(searchTf);
+        searchTf.setBounds(10, 30, 730, 38);
 
-        mainFrame.setLayout(null);
-        mainScrollPane.setViewportView(mainFrame);
+        mainPanel.setLayout(null);
+        mainScrollPane.setViewportView(mainPanel);
+
+        getContentPane().add(mainScrollPane);
+        mainScrollPane.setBounds(6, 98, 1240, 540);
 
         favouritesButton.setText("View favourites");
         favouritesButton.addActionListener(new java.awt.event.ActionListener() {
@@ -88,37 +104,17 @@ public class mainFrame extends javax.swing.JFrame {
                 favouritesButtonActionPerformed(evt);
             }
         });
+        getContentPane().add(favouritesButton);
+        favouritesButton.setBounds(970, 50, 140, 29);
 
-        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
-        getContentPane().setLayout(layout);
-        layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                        .addGap(58, 58, 58)
-                        .addComponent(searchTf, javax.swing.GroupLayout.DEFAULT_SIZE, 248, Short.MAX_VALUE)
-                        .addGap(18, 18, 18)
-                        .addComponent(searchBt, javax.swing.GroupLayout.PREFERRED_SIZE, 68, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(18, 18, 18)
-                        .addComponent(favouritesButton)
-                        .addGap(5, 5, 5))
-                    .addGroup(layout.createSequentialGroup()
-                        .addContainerGap()
-                        .addComponent(mainScrollPane)))
-                .addContainerGap())
-        );
-        layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addGap(36, 36, 36)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(searchBt)
-                    .addComponent(searchTf, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(favouritesButton))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(mainScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 280, Short.MAX_VALUE))
-        );
+        viewOffline.setText("View Offline");
+        viewOffline.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                viewOfflineActionPerformed(evt);
+            }
+        });
+        getContentPane().add(viewOffline);
+        viewOffline.setBounds(970, 20, 140, 29);
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
@@ -137,6 +133,11 @@ public class mainFrame extends javax.swing.JFrame {
         // TODO add your handling code here:
         favouritesFrame obj = new favouritesFrame();
     }//GEN-LAST:event_favouritesButtonActionPerformed
+
+    private void viewOfflineActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_viewOfflineActionPerformed
+        // TODO add your handling code here:
+        viewOffline obj = new viewOffline();
+    }//GEN-LAST:event_viewOfflineActionPerformed
 
     /**
      * @param args the command line arguments
@@ -179,7 +180,7 @@ public class mainFrame extends javax.swing.JFrame {
         @Override
         public void run() {
             try {
-                mainFrame.removeAll();
+                mainPanel.removeAll();
                 String search = searchTf.getText();
                 search.replaceAll(" ", "%20");
                 URL url = new URL("http://food2fork.com/api/search?key=" + credentials.API_KEY + "&q=" + search);
@@ -193,7 +194,6 @@ public class mainFrame extends javax.swing.JFrame {
                 long count = (long) jsonObject.get("count");
 //        System.out.println(count);
                 singlePanel[] sp = new singlePanel[(int) count];
-                mainFrame.setPreferredSize(new Dimension(600, 5000));
                 JSONArray recipes = (JSONArray) jsonObject.get("recipes");//Object of recipes array[objects]
 
                 int x = 10;
@@ -226,9 +226,9 @@ public class mainFrame extends javax.swing.JFrame {
                         }
                     });
 
-                    mainFrame.add(sp[i]);
+                    mainPanel.add(sp[i]);
                     repaint();
-                    if (x < 500) {
+                    if (x < 800) {
                         x += 240;
                     } else {
                         x = 10;
@@ -237,7 +237,7 @@ public class mainFrame extends javax.swing.JFrame {
 //            System.out.println(title);  
 //            System.out.println(image_url);
 //            System.out.println(rId);  
-                    
+
                 }
                 br.close();
             } catch (Exception ex) {
@@ -265,9 +265,10 @@ public class mainFrame extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton favouritesButton;
-    private javax.swing.JPanel mainFrame;
+    private javax.swing.JPanel mainPanel;
     private javax.swing.JScrollPane mainScrollPane;
     private javax.swing.JButton searchBt;
     private javax.swing.JTextField searchTf;
+    private javax.swing.JButton viewOffline;
     // End of variables declaration//GEN-END:variables
 }

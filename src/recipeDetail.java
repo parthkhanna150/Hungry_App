@@ -12,6 +12,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.io.Writer;
@@ -27,87 +28,87 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
+import java.net.MalformedURLException;
+import javax.swing.JOptionPane;
 
 /*
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-
 /**
  *
  * @author vasu
  */
 public class recipeDetail extends javax.swing.JFrame {
+
+    String title;
+    String image_url;
+    String recipe_id;
+    int h = Toolkit.getDefaultToolkit().getScreenSize().height;
+    int w = Toolkit.getDefaultToolkit().getScreenSize().width;
     String source_url;
-    String ingredientString="";
-    String title, imageUrl, rID;
+    String ingredients = "";
     String procedure;
-int w,h;
-File fw;
+
     /**
      * Creates new form recipeDetail
+     *
      * @param title
      * @param imageUrl
      * @param rID
      */
     public recipeDetail(String title, String imageUrl, String rID) {
         initComponents();
-        this.imageUrl = imageUrl;
-        this.rID = rID;
+        this.image_url = imageUrl;
+        this.recipe_id = rID;
         this.title = title;
-        detail_title.setText("<html>"+this.title+"<html>");
-        try{
-            URL detail_img_url = new URL(this.imageUrl);
+        data_panel.setSize(w, 300);
+        getContentPane().setBackground(java.awt.Color.PINK);
+        ingredient_mainPanel.setSize(w, 500);
+        
+        procedure_mainPanel.setSize(w, 500);
+        detail_title.setText("<html>" + this.title + "<html>");
+        try {
+            URL detail_img_url = new URL(this.image_url);
             URLConnection conn2 = detail_img_url.openConnection();
             conn2.setRequestProperty("User-Agent", "Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10_5_8; en-US) AppleWebKit/532.5 (KHTML, like Gecko) Chrome/4.0.249.0 Safari/532.5");
             BufferedImage img = ImageIO.read(conn2.getInputStream());
-            BufferedImage tempJPG = resize(img,177, 88);
+            BufferedImage tempJPG = resize(img, 177, 88);
             detail_icon.setIcon(new ImageIcon(tempJPG));
-            h=Toolkit.getDefaultToolkit().getScreenSize().height;
-            w=Toolkit.getDefaultToolkit().getScreenSize().width;
-            setSize(w,h);
-            
-            fw = new File("favourites.txt");
-            if(fw.exists()){
-                
-            FileInputStream fis = new FileInputStream("favourites.txt");
-            BufferedReader br = new BufferedReader(new InputStreamReader(fis));
-            String s1="";
-            String tmp="";
-            while(true){
-                tmp = br.readLine();
-                if(tmp==null){
-                    break;
+            setSize(w, h);
+            fetch_detail job = new fetch_detail();
+            Thread t = new Thread(job);
+            t.start();
+            File f = new File("Favourite.txt");
+            if (f.exists()) {
+                FileInputStream fis = new FileInputStream("Favourite.txt");
+                BufferedReader br = new BufferedReader(new InputStreamReader(fis));
+
+                String s = "";
+                while (true) {
+                    String s1 = br.readLine();
+                    if (s1 == null) {
+                        break;
+                    }
+                    s += s1;
+
                 }
-                s1+=tmp;
-               
-            }
-                if(s1.contains(";"+rID+";")){
+                if (s.contains("~" + recipe_id + "~")) {
                     addToFavouriteGrey.setVisible(false);
                     addToFavouriteRed.setVisible(true);
+                } else {
+                    addToFavouriteGrey.setVisible(true);
+                    addToFavouriteRed.setVisible(false);
                 }
-                else{
-                    addToFavouriteRed.setVisible(false);
-                    addToFavouriteGrey.setVisible(true);
-                }            
+                fis.close();
             }
-            else{
-                    addToFavouriteRed.setVisible(false);
-                    addToFavouriteGrey.setVisible(true);
-            }
-        }
-                catch(Exception ex)
-        {
+        } catch (Exception ex) {
             ex.printStackTrace();
         }
-        fetch_detail job = new fetch_detail();
-        Thread t = new Thread(job);
-        t.start();
-
     }
-    
-        public BufferedImage resize(BufferedImage image, int width, int height) {
+
+    public BufferedImage resize(BufferedImage image, int width, int height) {
         BufferedImage bi = new BufferedImage(width, height, BufferedImage.TRANSLUCENT);
         Graphics2D g2d = (Graphics2D) bi.createGraphics();
         g2d.addRenderingHints(new RenderingHints(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY));
@@ -116,7 +117,7 @@ File fw;
 //        System.out.println(bi);
         return bi;
     }
-        
+
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -132,6 +133,8 @@ File fw;
         addToFavouriteGrey = new javax.swing.JButton();
         addToFavouriteRed = new javax.swing.JButton();
         offlineButton = new javax.swing.JButton();
+        notSavedOffline = new javax.swing.JLabel();
+        jButton1 = new javax.swing.JButton();
         ingredient_mainPanel = new javax.swing.JPanel();
         ingredient_title = new javax.swing.JLabel();
         ingredient_scrollpane = new javax.swing.JScrollPane();
@@ -143,16 +146,20 @@ File fw;
         openBrowser = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        setBackground(new java.awt.Color(255, 255, 204));
         getContentPane().setLayout(null);
 
-        detail_panel.setBackground(new java.awt.Color(255, 255, 255));
+        detail_panel.setBackground(new java.awt.Color(255, 255, 204));
         detail_panel.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
         detail_panel.setToolTipText("");
         detail_panel.setLayout(null);
         detail_panel.add(detail_icon);
         detail_icon.setBounds(7, 7, 177, 88);
+
+        detail_title.setFont(new java.awt.Font("Lucida Grande", 3, 14)); // NOI18N
+        detail_title.setForeground(new java.awt.Color(204, 51, 0));
         detail_panel.add(detail_title);
-        detail_title.setBounds(200, 40, 178, 31);
+        detail_title.setBounds(200, 40, 290, 31);
 
         addToFavouriteGrey.setIcon(new javax.swing.ImageIcon(getClass().getResource("/grey.png"))); // NOI18N
         addToFavouriteGrey.setText("Add to favourites");
@@ -175,18 +182,34 @@ File fw;
         addToFavouriteRed.setBounds(200, 90, 170, 29);
 
         offlineButton.setText("Save Offline");
+        offlineButton.setEnabled(false);
         offlineButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 offlineButtonActionPerformed(evt);
             }
         });
         detail_panel.add(offlineButton);
-        offlineButton.setBounds(190, 9, 190, 30);
+        offlineButton.setBounds(540, 80, 160, 40);
+
+        notSavedOffline.setBackground(new java.awt.Color(255, 255, 255));
+        notSavedOffline.setFont(new java.awt.Font("Lucida Grande", 2, 14)); // NOI18N
+        notSavedOffline.setForeground(new java.awt.Color(153, 0, 153));
+        detail_panel.add(notSavedOffline);
+        notSavedOffline.setBounds(520, 40, 200, 30);
+
+        jButton1.setText("Watch Videos");
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
+        detail_panel.add(jButton1);
+        jButton1.setBounds(380, 80, 150, 40);
 
         getContentPane().add(detail_panel);
-        detail_panel.setBounds(0, -1, 830, 140);
+        detail_panel.setBounds(0, 0, 1350, 140);
 
-        ingredient_mainPanel.setBackground(new java.awt.Color(255, 255, 255));
+        ingredient_mainPanel.setBackground(new java.awt.Color(255, 255, 204));
         ingredient_mainPanel.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
         ingredient_mainPanel.setLayout(null);
 
@@ -198,24 +221,25 @@ File fw;
         ingredient_scrollpane.setViewportView(data_panel);
 
         ingredient_mainPanel.add(ingredient_scrollpane);
-        ingredient_scrollpane.setBounds(10, 50, 680, 110);
+        ingredient_scrollpane.setBounds(10, 50, 1210, 110);
 
         getContentPane().add(ingredient_mainPanel);
-        ingredient_mainPanel.setBounds(0, 180, 830, 170);
+        ingredient_mainPanel.setBounds(0, 180, 1230, 170);
 
-        procedure_mainPanel.setBackground(new java.awt.Color(255, 255, 255));
+        procedure_mainPanel.setBackground(new java.awt.Color(255, 255, 204));
         procedure_mainPanel.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
         procedure_mainPanel.setLayout(null);
 
         instructionTitle.setText("Instructions");
         procedure_mainPanel.add(instructionTitle);
-        instructionTitle.setBounds(30, 10, 90, 20);
+        instructionTitle.setBounds(30, 10, 490, 20);
 
+        instructions_editor.setContentType("text/html");
         instructions_editor.setSize(new java.awt.Dimension(100, 40));
         jScrollPane1.setViewportView(instructions_editor);
 
         procedure_mainPanel.add(jScrollPane1);
-        jScrollPane1.setBounds(10, 40, 680, 130);
+        jScrollPane1.setBounds(10, 40, 1230, 130);
 
         openBrowser.setText("Look Up");
         openBrowser.addActionListener(new java.awt.event.ActionListener() {
@@ -224,110 +248,148 @@ File fw;
             }
         });
         procedure_mainPanel.add(openBrowser);
-        openBrowser.setBounds(590, 10, 100, 29);
+        openBrowser.setBounds(880, 10, 100, 29);
 
         getContentPane().add(procedure_mainPanel);
-        procedure_mainPanel.setBounds(0, 380, 830, 270);
+        procedure_mainPanel.setBounds(0, 380, 1240, 270);
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
     private void openBrowserActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_openBrowserActionPerformed
         // TODO add your handling code here:
-        try{
-        Desktop.getDesktop().browse(new URI(source_url));
-        }
-        catch(Exception ex){
+        try {
+            Desktop.getDesktop().browse(new URI(this.source_url));
+        } catch (Exception ex) {
             ex.printStackTrace();
         }
     }//GEN-LAST:event_openBrowserActionPerformed
 
     private void addToFavouriteRedActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addToFavouriteRedActionPerformed
         // TODO add your handling code here:
-        try{
-            String tmp;
-            String t="";
-            FileInputStream fis = new FileInputStream("favourites.txt");
+        try {
+            FileInputStream fis = new FileInputStream("Favourite.txt");
             BufferedReader br = new BufferedReader(new InputStreamReader(fis));
-            while(true){
-                tmp = br.readLine();
-                if(tmp==null){
-//                    System.out.println("Broken");
+
+            FileOutputStream fos = new FileOutputStream("temp.txt");
+            PrintWriter pw = new PrintWriter(fos);
+
+            while (true) {
+                String s = br.readLine();
+                if (s == null) {
                     break;
+                } else if (s.contains("~" + recipe_id + "~")) {
+                    //skips the item
+                } else {
+                    pw.println(s);
                 }
-//                System.out.println(t + "<--t \n \n \n tmp-->  " + tmp);
-                t += tmp;
             }
-//            System.out.println(t);
-                if(t.contains(";"+rID+";")){
-                    int start = t.indexOf(";"+rID+";");
-                    int stop = t.lastIndexOf(";"+rID+";");
-                    int end = t.indexOf("`", stop);
-//                    System.out.println(start + " " + end);
-                    String remove = t.substring(start, end+1);
-                    
-//                    System.out.println(start + " " + end);
-//                    System.out.println(remove + " " + remove.length());
-//                    System.out.println(t);
-                    t = t.replace(remove, "");
-                }
-        br.close();
-        fis.close();
-//        fw.delete();
+            pw.flush();
+            fis.close();
+            fos.close();
 
-//            System.out.println(t+"-------");
+            File f = new File("Favourite.txt");
+            f.delete();
+            File f1 = new File("temp.txt");
+            File f2 = new File("Favourite.txt");
+            f1.renameTo(f2);
+            addToFavouriteGrey.setVisible(true);
+            addToFavouriteRed.setVisible(false);
 
-        FileOutputStream fos1 = new FileOutputStream("favourites.txt");
-        PrintWriter pw1 = new PrintWriter(fos1);
-        pw1.write(t);
-        pw1.close();
-        fos1.close();
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-        catch(Exception ex){
-            ex.printStackTrace();
-        }
-        addToFavouriteRed.setVisible(false);
-        addToFavouriteGrey.setVisible(true);
     }//GEN-LAST:event_addToFavouriteRedActionPerformed
 
     private void addToFavouriteGreyActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addToFavouriteGreyActionPerformed
         // TODO add your handling code here:
-        try{
-        FileOutputStream fos = new FileOutputStream("favourites.txt", true);
-        PrintWriter writer = new PrintWriter(fos);
-        writer.println(";"+rID+";"+title+";"+ imageUrl);
-        writer.close();  
+        try {
+            FileOutputStream fos = new FileOutputStream("Favourite.txt", true);
+            PrintWriter pw = new PrintWriter(fos);
+
+            pw.println("~" + recipe_id + "~" + title + "~" + image_url + ";");
+            pw.flush();
+            fos.close();
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-        catch(Exception ex){
-            ex.printStackTrace();
-        }
+
         addToFavouriteGrey.setVisible(false);
         addToFavouriteRed.setVisible(true);
     }//GEN-LAST:event_addToFavouriteGreyActionPerformed
 
     private void offlineButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_offlineButtonActionPerformed
         // TODO add your handling code here:
-        File offline = new File("OfflineFolder");
-        if(!offline.exists()){
-            offline.mkdir();
-        }
-        String ing = ingredientString;
-        String procedure1 = procedure;
-        String head = title;
-        String html = generate_offline_page(ing, procedure1, head);
-        try{
-        FileOutputStream f = new FileOutputStream(offline+"//"+rID+".html");
-        PrintWriter pw = new PrintWriter(f);
-        pw.println(html);
-        pw.flush();
-        f.close();
-        }
-        catch(Exception ex){
-            ex.printStackTrace();
+        try {
+            if (procedure.equals("Not Available")) {
+                JOptionPane.showMessageDialog(this, "This Recipe Can't be Downloaded");
+            } else {
+
+                File f = new File("Offline");
+                if (!f.exists()) {
+                    f.mkdir();
+                }
+
+                int Flag = 0;
+                File f2[] = f.listFiles();
+                for (int i = 0; i < f2.length; i++) {
+                    if (f2[i].getName().equals(recipe_id + ".html")) {
+                        int ans = JOptionPane.showConfirmDialog(this, "Already exists. Resave?");
+                        if (ans == JOptionPane.YES_OPTION) {
+                            Flag = 1;
+                            break;
+                        } else {
+                            Flag = 2;
+                            break;
+                        }
+                    }
+                }
+                if (Flag == 0 || Flag == 1) {
+                    String code = generate_offline_page(ingredients, procedure, title);
+                    FileOutputStream fos = new FileOutputStream(f + "//" + recipe_id + ".html");
+                    PrintWriter pw = new PrintWriter(fos);
+                    pw.println(code);
+                    pw.flush();
+                    fos.close();
+                    URL urlimg3 = new URL(image_url);
+                    URLConnection urlcon4 = urlimg3.openConnection();
+                    urlcon4.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/59.0.3071.115 Safari/537.36");
+                    InputStream is = urlcon4.getInputStream();
+                    FileOutputStream fos2 = new FileOutputStream(f + "//" + recipe_id + ".jpg");
+                    byte b[] = new byte[10000];
+                    while (true) {
+                        int r = is.read(b, 0, 1000);
+                        if (r == -1) {
+                            break;
+                        }
+                        fos2.write(b, 0, r);
+                    }
+                    fos2.close();
+
+                    if (Flag == 0) {
+                        FileOutputStream fos3 = new FileOutputStream("offline.txt", true);
+                        PrintWriter pw3 = new PrintWriter(fos3);
+                        pw3.println("~" + recipe_id + "~" + title + ";");
+                        pw3.flush();
+                        pw3.close();
+                        fos3.close();
+
+                    }
+                    JOptionPane.showMessageDialog(this, "File Saved Successfully");
+                }
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }//GEN-LAST:event_offlineButtonActionPerformed
-        String generate_offline_page(String ing, String procedure1, String title) {
-            String offline = "<html>\n"
+
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        // TODO add your handling code here:
+        YoutubeSearch ob = new YoutubeSearch(this.title);
+    }//GEN-LAST:event_jButton1ActionPerformed
+    String generate_offline_page(String ing, String procedure1, String title) {
+        String offline = "<html>\n"
                 + "    <head>\n"
                 + "        <title>" + title + "</title>\n"
                 + "      \n"
@@ -335,7 +397,7 @@ File fw;
                 + "    <body style=\"background: #ccccff\">\n"
                 + "        \n"
                 + "        <div style=\"border: solid 1px black; border-radius: 5px;background: white; padding: 20px \">\n"
-//                + "            <img src=\""+rId+".jpg\" width=\"100\" height=\"100\" />\n"
+                + "            <img src=\"" + recipe_id + ".jpg\" width=\"100\" height=\"100\" />\n"
                 + "            \n"
                 + "            <label style=\"font-style: italic; font-size: 25px; position: relative; top: -50px;left: 50px\"><b>" + title + "</b></label>\n"
                 + "            \n"
@@ -356,8 +418,9 @@ File fw;
                 + "</html>\n"
                 + "";
 
-            return offline;
-        }
+        return offline;
+    }
+
     /**
      * @param args the command line arguments
      */
@@ -393,98 +456,90 @@ File fw;
 //            }
 //        });
 //    }
-    
-    
-    class fetch_detail implements Runnable{
+    class fetch_detail implements Runnable {
+
         @Override
-    public void run() {
-        try{
-        String id=rID;
-        URL url = new URL("http://food2fork.com/api/get?key="+credentials.API_KEY+"&rId="+id);
-        URLConnection conn = url.openConnection();
-        conn.setRequestProperty("User-Agent", "Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10_5_8; en-US) AppleWebKit/532.5 (KHTML, like Gecko) Chrome/4.0.249.0 Safari/532.5");
-        BufferedReader br = new BufferedReader(
-        new InputStreamReader(conn.getInputStream()));
-        JSONParser jsonParser = new JSONParser();
-        
-        JSONObject jsonObject = (JSONObject) jsonParser.parse(br.readLine());//Full Search Object
-        
-        JSONObject recipe = (JSONObject) jsonObject.get("recipe");
-        String source = (String) recipe.get("source_url");
-        JSONArray ingredients = (JSONArray) recipe.get("ingredients");
+        public void run() {
+            try {
+                String id = recipe_id;
+                URL url = new URL("http://food2fork.com/api/get?key=" + credentials.API_KEY + "&rId=" + id);
+                URLConnection conn = url.openConnection();
+                conn.setRequestProperty("User-Agent", "Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10_5_8; en-US) AppleWebKit/532.5 (KHTML, like Gecko) Chrome/4.0.249.0 Safari/532.5");
+                BufferedReader br = new BufferedReader(
+                        new InputStreamReader(conn.getInputStream()));
+                JSONParser jsonParser = new JSONParser();
+
+                JSONObject jsonObject = (JSONObject) jsonParser.parse(br.readLine());//Full Search Object
+
+                JSONObject recipe = (JSONObject) jsonObject.get("recipe");
+                source_url = (String) recipe.get("source_url");
+                JSONArray ingredientsArray = (JSONArray) recipe.get("ingredients");
 //        System.out.println(count);
-        JLabel[] ingredLabel = new JLabel[(int)ingredients.size()];
-        data_panel.setPreferredSize(new Dimension(600, 5000));
-        int y = 10;
-        for(int i=0; i<ingredLabel.length;i++){
-            ingredLabel[i]=new JLabel();
-            ingredLabel[i].setBounds(10, y, 600, 10);
-            ingredLabel[i].setText((String)ingredients.get(i));
-            
-            ingredientString += (String) ingredients.get(i) +"<br>";//string for offline pages
-            
-            data_panel.add(ingredLabel[i]);
-            data_panel.repaint();
-            y+=20;
-            }
-        
-            setSize(w+1, h+1);
-            setSize(w, h);
-        
-        br.close();
-        procedure = fetch_description(source);
+                JLabel[] ingredLabel = new JLabel[(int) ingredientsArray.size()];
+                data_panel.setPreferredSize(new Dimension(600, 5000));
+                int y = 10;
+                for (int i = 0; i < ingredLabel.length; i++) {
+                    ingredLabel[i] = new JLabel();
+                    ingredLabel[i].setBounds(10, y, 600, 10);
+                    ingredLabel[i].setText((String) ingredientsArray.get(i));
+
+                    ingredients += (String) ingredientsArray.get(i) + "<br>";//string for offline pages
+
+                    data_panel.add(ingredLabel[i]);
+                    data_panel.repaint();
+                    y += 20;
+                }
+
+                setSize(w + 1, h + 1);
+                setSize(w, h);
+
+                br.close();
+                procedure = fetch_description(source_url);
 //        System.out.println(procedure);
 //        if(procedure.equals("Not available"))
 //            openBrowser.setVisible(false);
-        instructions_editor.setText(procedure);
-        }
-        catch(Exception ex){
-            ex.printStackTrace();
+                instructions_editor.setText(procedure);
+                offlineButton.setEnabled(true);
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
         }
     }
- }
-    public String fetch_description(String source_url){
-//        System.out.println(source_url);
-        String response="";
-        try{
-            int index;
-            URL desc = new URL(source_url);
-            URLConnection conn = desc.openConnection();
-            conn.setRequestProperty("User-Agent", "Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10_5_8; en-US) AppleWebKit/532.5 (KHTML, like Gecko) Chrome/4.0.249.0 Safari/532.5");
-            BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream()));
-            String webpage = "";
-            while(true){
-//                System.out.println("IN WHILE LOOP");
-                String sub = br.readLine();
-                if(sub==null)
-                {
+
+    public String fetch_description(String source_url) {
+        try {
+            URL url = new URL(source_url);
+            URLConnection urlcon = url.openConnection();
+            urlcon.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/59.0.3071.115 Safari/537.36");
+            InputStream stream = urlcon.getInputStream();
+            BufferedReader br = new BufferedReader(new InputStreamReader(stream));
+            String procedure = "";
+            while (true) {
+                String s = br.readLine();
+                if (s == null) {
                     break;
                 }
-                
-                webpage += sub;
-//                System.out.println(webpage);
+                procedure = procedure + s;
             }
-//            System.out.println(webpage);
-            String instr = "nstruction";
-            if(webpage.indexOf(instr)==-1){
-                response = "Not available";
+            int index = procedure.indexOf("<h4 class=\"panel-title\">Instructions</h4>");
+            if (index == -1) {
+                procedure = "Not Available";
                 openBrowser.setVisible(true);
-            }
-            else{
+            } else {
                 openBrowser.setVisible(false);
-                index = webpage.indexOf(instr);
-//                System.out.println(index);
-                response = webpage.substring(webpage.indexOf(">",index)+1, webpage.indexOf("<",webpage.indexOf(">",index)+1));
-                }
+                int start = procedure.indexOf("<div class=\"panel-body\">", index);
+                int end = procedure.indexOf("</div>", start);
+                procedure = procedure.substring(start, end + 6);
+
             }
-        catch(Exception ex){
-            ex.printStackTrace();
+            return procedure;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
         }
-        return response;
     }
-    
-        
-    
+
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton addToFavouriteGrey;
     private javax.swing.JButton addToFavouriteRed;
@@ -497,7 +552,9 @@ File fw;
     private javax.swing.JLabel ingredient_title;
     private javax.swing.JLabel instructionTitle;
     private javax.swing.JEditorPane instructions_editor;
+    private javax.swing.JButton jButton1;
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JLabel notSavedOffline;
     private javax.swing.JButton offlineButton;
     private javax.swing.JButton openBrowser;
     private javax.swing.JPanel procedure_mainPanel;

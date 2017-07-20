@@ -9,11 +9,20 @@
  * @author vasu
  */
 public class recipe {
-    String rID; String title; String imageUrl;
 
-    public recipe(String rID, String title, String imageUrl){
-        this.imageUrl=imageUrl;
-        this.rID=imageUrl;
-        this.title=title;
-            }
+    String rID;
+    String title;
+    String imageUrl;
+
+    public recipe(String rID, String title, String imageUrl) {
+        this.imageUrl = imageUrl;
+        this.rID = imageUrl;
+        this.title = title;
+    }
+
+    public recipe(String recipe_id, String title) {
+        this.rID = recipe_id;
+        this.title = title;
+    }
+
 }

@@ -4,11 +4,14 @@
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
             <file>file:/Users/vasu/NetBeansProjects/Recipe/src/recipeDetail.java</file>
-            <file>file:/Users/vasu/NetBeansProjects/Recipe/src/credentials.java</file>
-            <file>file:/Users/vasu/NetBeansProjects/Recipe/src/favouritesFrame.java</file>
+            <file>file:/Users/vasu/NetBeansProjects/Recipe/src/singlePanelYoutube.java</file>
+            <file>file:/Users/vasu/NetBeansProjects/Recipe/src/YoutubeBrowse.java</file>
+            <file>file:/Users/vasu/NetBeansProjects/Recipe/src/YoutubeSearch.java</file>
             <file>file:/Users/vasu/NetBeansProjects/Recipe/src/recipe.java</file>
+            <file>file:/Users/vasu/NetBeansProjects/Recipe/src/favouritesFrame.java</file>
             <file>file:/Users/vasu/NetBeansProjects/Recipe/src/mainFrame.java</file>
-            <file>file:/Users/vasu/NetBeansProjects/Recipe/src/singlePanel.java</file>
+            <file>file:/Users/vasu/NetBeansProjects/Recipe/src/splashScreen.java</file>
+            <file>file:/Users/vasu/NetBeansProjects/Recipe/src/viewOffline.java</file>
         </group>
     </open-files>
 </project-private>

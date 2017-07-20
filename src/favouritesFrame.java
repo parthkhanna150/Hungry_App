@@ -33,84 +33,86 @@ import javax.swing.JFrame;
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-
 /**
  *
  * @author vasu
  */
 public class favouritesFrame extends javax.swing.JFrame {
-ArrayList<recipe> al = new ArrayList();
 
-    /**
-     * Creates new form favouritesFrame
-     * @param rID
-     * @param title
-     * @param imageUrl
-     */
+    ArrayList<recipe> al = new ArrayList();
 
-    public favouritesFrame()  {
+    public favouritesFrame() {
         initComponents();
-        setSize(1000,800);
+        int h = Toolkit.getDefaultToolkit().getScreenSize().height;
+        int w = Toolkit.getDefaultToolkit().getScreenSize().width;
+        this.setSize(w, h);
+        getContentPane().setBackground(java.awt.Color.PINK);
+
         setVisible(true);
-        try{
-        FileInputStream fis = new FileInputStream("favourites.txt");
-        BufferedReader br = new BufferedReader(new InputStreamReader(fis));
-        String s="";
-        while(true){
-            String line = br.readLine();
-            if(line==null)
-                break;
-            s+=line;
-        }
-        StringTokenizer token = new StringTokenizer(s, ";");
-        while(token.hasMoreTokens()){
-            String ID = token.nextToken();
-            String heading = token.nextToken();
-            String image = token.nextToken();
-            al.add(new recipe(ID, heading, image));
-        }
-        singlePanel[] sp = new singlePanel[al.size()];
-        favPanel.setPreferredSize(new Dimension(1000, 5000));
-        int x=10; int y=10;
-         for (int i = 0; i < sp.length; i++) {
-                   final String id = al.get(i).rID;
-                   final String head = al.get(i).title;
-                   final String imgurl = al.get(i).imageUrl;
-                    sp[i] = new singlePanel();
-                    sp[i].setBounds(x, y, 200, 200);
-                    sp[i].lb_title.setText("<html>" + head + "<html>");
-                    URL imgUrl = new URL(imgurl);
-                    URLConnection conn2 = imgUrl.openConnection();
-                    conn2.setRequestProperty("User-Agent", "Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10_5_8; en-US) AppleWebKit/532.5 (KHTML, like Gecko) Chrome/4.0.249.0 Safari/532.5");
-                    BufferedImage img = ImageIO.read(conn2.getInputStream());
-                    BufferedImage tempJPG = resize(img, 200, 200);
-                    sp[i].lb_icon.setIcon(new ImageIcon(tempJPG));
+        try {
+            FileInputStream fis = new FileInputStream("Favourite.txt");
+            BufferedReader br = new BufferedReader(new InputStreamReader(fis));
+            String s = "";
+            while (true) {
+                String line = br.readLine();
+                if (line == null) {
+                    break;
+                }
+                s += line;
+            }
+            StringTokenizer st = new StringTokenizer(s, ";");
+            while (st.hasMoreTokens()) {
+                String sub = st.nextToken();
+                StringTokenizer st1 = new StringTokenizer(sub, "~");
+                String recipe_id = st1.nextToken();
+                String title = st1.nextToken();
+                String image_url = st1.nextToken();
+
+                al.add(new recipe(recipe_id, title, image_url));
+            }
+            singlePanel[] sp = new singlePanel[al.size()];
+            favPanel.setSize(w, h);
+            int x = 10;
+            int y = 10;
+            for (int i = 0; i < sp.length; i++) {
+                final String id = al.get(i).rID;
+                final String head = al.get(i).title;
+                final String imgurl = al.get(i).imageUrl;
+                sp[i] = new singlePanel();
+                sp[i].setBounds(x, y, 200, 200);
+                sp[i].lb_title.setText("<html>" + head + "<html>");
+                URL imgUrl = new URL(imgurl);
+                URLConnection conn2 = imgUrl.openConnection();
+                conn2.setRequestProperty("User-Agent", "Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10_5_8; en-US) AppleWebKit/532.5 (KHTML, like Gecko) Chrome/4.0.249.0 Safari/532.5");
+                BufferedImage img = ImageIO.read(conn2.getInputStream());
+                BufferedImage tempJPG = resize(img, 200, 200);
+                sp[i].lb_icon.setIcon(new ImageIcon(tempJPG));
 //
-                    sp[i].addMouseListener(new MouseAdapter() {
-                        @Override
-                        public void mouseClicked(MouseEvent e) {
-                            if (e.getClickCount() == 2) {
-                                recipeDetail rd = new recipeDetail(head, imgurl, id);
-                                rd.setVisible(true);
+                sp[i].addMouseListener(new MouseAdapter() {
+                    @Override
+                    public void mouseClicked(MouseEvent e) {
+                        if (e.getClickCount() == 2) {
+                            recipeDetail rd = new recipeDetail(head, imgurl, id);
+                            rd.setVisible(true);
 //
-                            }
                         }
-                    });
-                    favPanel.add(sp[i]);
-                    favPanel.repaint();
-                    if (x < 500) {
-                        x += 240;
-                    } else {
-                        x = 10;
-                        y += 240;
                     }
+                });
+                favPanel.add(sp[i]);
+                favPanel.repaint();
+                if (x < 500) {
+                    x += 240;
+                } else {
+                    x = 10;
+                    y += 240;
+                }
             }
             br.close();
-         }
-        catch (Exception ex) {
+        } catch (Exception ex) {
             ex.printStackTrace();
         }
     }
+
     /**
      *
      * @param image
@@ -119,17 +121,14 @@ ArrayList<recipe> al = new ArrayList();
      * @return
      */
     public BufferedImage resize(BufferedImage image, int width, int height) {
-            BufferedImage bi = new BufferedImage(width, height, BufferedImage.TRANSLUCENT);
-            Graphics2D g2d = (Graphics2D) bi.createGraphics();
-            g2d.addRenderingHints(new RenderingHints(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY));
-            g2d.drawImage(image, 0, 0, width, height, null);
-            g2d.dispose();
+        BufferedImage bi = new BufferedImage(width, height, BufferedImage.TRANSLUCENT);
+        Graphics2D g2d = (Graphics2D) bi.createGraphics();
+        g2d.addRenderingHints(new RenderingHints(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY));
+        g2d.drawImage(image, 0, 0, width, height, null);
+        g2d.dispose();
 //        System.out.println(bi);
-            return bi;
-        }
-        
-    
-
+        return bi;
+    }
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -148,9 +147,12 @@ ArrayList<recipe> al = new ArrayList();
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         getContentPane().setLayout(null);
 
+        jLabel1.setFont(new java.awt.Font("Lucida Grande", 1, 18)); // NOI18N
+        jLabel1.setForeground(new java.awt.Color(204, 51, 0));
+        jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
         jLabel1.setText("My Favourites");
         getContentPane().add(jLabel1);
-        jLabel1.setBounds(20, 20, 240, 16);
+        jLabel1.setBounds(20, 20, 240, 50);
 
         clearAll.setText("Clear all");
         clearAll.addActionListener(new java.awt.event.ActionListener() {
@@ -159,32 +161,20 @@ ArrayList<recipe> al = new ArrayList();
             }
         });
         getContentPane().add(clearAll);
-        clearAll.setBounds(250, 20, 95, 29);
+        clearAll.setBounds(1050, 40, 160, 40);
 
-        favPanel.setBounds(new java.awt.Rectangle(0, 0, 0, 0));
-
-        javax.swing.GroupLayout favPanelLayout = new javax.swing.GroupLayout(favPanel);
-        favPanel.setLayout(favPanelLayout);
-        favPanelLayout.setHorizontalGroup(
-            favPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 396, Short.MAX_VALUE)
-        );
-        favPanelLayout.setVerticalGroup(
-            favPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 236, Short.MAX_VALUE)
-        );
-
+        favPanel.setLayout(null);
         sp.setViewportView(favPanel);
 
         getContentPane().add(sp);
-        sp.setBounds(0, 60, 400, 240);
+        sp.setBounds(10, 150, 1250, 480);
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
     private void clearAllActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_clearAllActionPerformed
         // TODO add your handling code here:
-        File f = new File("favourites.txt");
+        File f = new File("Favourite.txt");
         f.delete();
         al.clear();
         favPanel.removeAll();
