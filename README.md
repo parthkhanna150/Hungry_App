@@ -14,14 +14,11 @@ You'll need Java Runtime Environment (or Java Development Toolkit which contains
 
 ### Steps
 
-Download zip folder or git clone the repository
+Download zip folder or git clone the repository:
 ```
-git clone 
+git clone https://github.com/parthkhanna150/Hungry-App.git
 ```
-make sure you have
-
-
-
+To run the applet, make sure you have the FullStackRecipeSoftware.jar file of the project and the lib folder in the same directory. Then open FullStackRecipeSoftware.jar and enjoy the app! 
 
 ### Built With
 
