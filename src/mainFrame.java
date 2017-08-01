@@ -67,6 +67,7 @@ public class mainFrame extends javax.swing.JFrame {
         mainPanel = new javax.swing.JPanel();
         favouritesButton = new javax.swing.JButton();
         viewOffline = new javax.swing.JButton();
+        searchLabel = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setForeground(new java.awt.Color(204, 51, 0));
@@ -115,6 +116,12 @@ public class mainFrame extends javax.swing.JFrame {
         });
         getContentPane().add(viewOffline);
         viewOffline.setBounds(970, 20, 140, 29);
+
+        searchLabel.setFont(new java.awt.Font("Lucida Grande", 3, 14)); // NOI18N
+        searchLabel.setForeground(new java.awt.Color(204, 51, 0));
+        searchLabel.setText("Search for recipe here:");
+        getContentPane().add(searchLabel);
+        searchLabel.setBounds(15, 10, 210, 17);
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
@@ -268,6 +275,7 @@ public class mainFrame extends javax.swing.JFrame {
     private javax.swing.JPanel mainPanel;
     private javax.swing.JScrollPane mainScrollPane;
     private javax.swing.JButton searchBt;
+    private javax.swing.JLabel searchLabel;
     private javax.swing.JTextField searchTf;
     private javax.swing.JButton viewOffline;
     // End of variables declaration//GEN-END:variables
