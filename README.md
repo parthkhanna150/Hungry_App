@@ -6,10 +6,19 @@ Accepts search queries and offers features such as tutorial videos, save offline
 add to favourites, making use of file storage system instead of database storage. 
 It allows for streaming of selected youtube video and their download for offline purposes in different qualities/formats.
 
+## Getting Started
 
 ### Prerequisites
 
 You'll need Java Runtime Environment (or Java Development Toolkit which contains JRE) installed on your computer to run this applet.
+
+### Steps
+
+Download zip folder or git clone the repository:
+```
+git clone https://github.com/parthkhanna150/Hungry-App.git
+```
+To run the applet, make sure you have the FullStackRecipeSoftware.jar file of the project and the lib folder in the same directory. Then open FullStackRecipeSoftware.jar and enjoy the app! 
 
 ### Built With
 
