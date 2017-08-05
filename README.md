@@ -20,7 +20,17 @@ git clone https://github.com/parthkhanna150/Hungry-App.git
 ```
 To run the applet, make sure you have the FullStackRecipeSoftware.jar file of the project and the lib folder in the same directory. Then open FullStackRecipeSoftware.jar and enjoy the app! 
 
+
+
+![alt text](https://github.com/parthkhanna150/Hungry-App/blob/master/images/splash.png)
+![alt text](https://github.com/parthkhanna150/Hungry-App/blob/master/images/search.png)
 ![alt text](https://github.com/parthkhanna150/Hungry-App/blob/master/images/detail.png)
+![alt text](https://github.com/parthkhanna150/Hungry-App/blob/master/images/favourites.png)
+![alt text](https://github.com/parthkhanna150/Hungry-App/blob/master/images/offline.png)
+![alt text](https://github.com/parthkhanna150/Hungry-App/blob/master/images/viewoffline.png)
+![alt text](https://github.com/parthkhanna150/Hungry-App/blob/master/images/youtubebrowse.png)
+![alt text](https://github.com/parthkhanna150/Hungry-App/blob/master/images/downloadvideo.png)
+
 
 ### Built With
 
